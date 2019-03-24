@@ -1,0 +1,177 @@
+MiNiFi Config Version: 3
+Flow Controller:
+  name: templateConvertRecord
+  comment: ''
+Core Properties:
+  flow controller graceful shutdown period: 10 sec
+  flow service write delay interval: 500 ms
+  administrative yield duration: 30 sec
+  bored yield duration: 10 millis
+  max concurrent threads: 1
+  variable registry properties: ''
+FlowFile Repository:
+  partitions: 256
+  checkpoint interval: 2 mins
+  always sync: false
+  Swap:
+    threshold: 20000
+    in period: 5 sec
+    in threads: 1
+    out period: 5 sec
+    out threads: 4
+Content Repository:
+  content claim max appendable size: 10 MB
+  content claim max flow files: 100
+  always sync: false
+Provenance Repository:
+  provenance rollover time: 1 min
+  implementation: org.apache.nifi.provenance.MiNiFiPersistentProvenanceRepository
+Component Status Repository:
+  buffer size: 1440
+  snapshot frequency: 1 min
+Security Properties:
+  keystore: ''
+  keystore type: ''
+  keystore password: ''
+  key password: ''
+  truststore: ''
+  truststore type: ''
+  truststore password: ''
+  ssl protocol: ''
+  Sensitive Props:
+    key:
+    algorithm: PBEWITHMD5AND256BITAES-CBC-OPENSSL
+    provider: BC
+Processors:
+- id: b4c192cb-28d3-373d-0000-000000000000
+  name: ConvertRecord
+  class: org.apache.nifi.processors.standard.ConvertRecord
+  max concurrent tasks: 1
+  scheduling strategy: TIMER_DRIVEN
+  scheduling period: 0 sec
+  penalization period: 30 sec
+  yield period: 1 sec
+  run duration nanos: 0
+  auto-terminated relationships list: []
+  Properties:
+    record-reader: 8bccc2ad-9a99-3d05-0000-000000000000
+    record-writer: 5a37ce51-20a8-3832-0000-000000000000
+- id: 667ceda0-1262-3803-0000-000000000000
+  name: HandleHttpRequest
+  class: org.apache.nifi.processors.standard.HandleHttpRequest
+  max concurrent tasks: 1
+  scheduling strategy: TIMER_DRIVEN
+  scheduling period: 0 sec
+  penalization period: 30 sec
+  yield period: 1 sec
+  run duration nanos: 0
+  auto-terminated relationships list: []
+  Properties:
+    Additional HTTP Methods:
+    Allow DELETE: 'true'
+    Allow GET: 'true'
+    Allow HEAD: 'false'
+    Allow OPTIONS: 'false'
+    Allow POST: 'true'
+    Allow PUT: 'true'
+    Allowed Paths:
+    Client Authentication: No Authentication
+    Default URL Character Set: UTF-8
+    HTTP Context Map: b75b502c-758a-39be-0000-000000000000
+    Hostname:
+    Listening Port: '${PORT}'
+    SSL Context Service:
+- id: 36e15f38-674d-3464-0000-000000000000
+  name: HandleHttpResponse
+  class: org.apache.nifi.processors.standard.HandleHttpResponse
+  max concurrent tasks: 1
+  scheduling strategy: TIMER_DRIVEN
+  scheduling period: 0 sec
+  penalization period: 30 sec
+  yield period: 1 sec
+  run duration nanos: 0
+  auto-terminated relationships list:
+  - failure
+  - success
+  Properties:
+    HTTP Context Map: b75b502c-758a-39be-0000-000000000000
+    HTTP Status Code: '200'
+Controller Services:
+- id: 8bccc2ad-9a99-3d05-0000-000000000000
+  name: CSVReader
+  type: org.apache.nifi.csv.CSVReader
+  Properties:
+    CSV Format:
+    Comment Marker:
+    Date Format:
+    Escape Character:
+    Null String:
+    Quote Character:
+    Skip Header Line: 'true'
+    Time Format:
+    Timestamp Format:
+    Trim Fields:
+    Value Separator:
+    csv-reader-csv-parser:
+    csvutils-character-set:
+    ignore-csv-header:
+    schema-access-strategy: csv-header-derived
+    schema-branch:
+    schema-name:
+    schema-registry:
+    schema-text:
+    schema-version:
+- id: 5a37ce51-20a8-3832-0000-000000000000
+  name: JsonRecordSetWriter
+  type: org.apache.nifi.json.JsonRecordSetWriter
+  Properties:
+    Date Format:
+    Pretty Print JSON: 'true'
+    Schema Write Strategy: 'no-schema'
+    Time Format:
+    Timestamp Format:
+    compression-format:
+    compression-level:
+    output-grouping:
+    schema-access-strategy:
+    schema-branch:
+    schema-cache:
+    schema-name:
+    schema-registry:
+    schema-text:
+    schema-version:
+    suppress-nulls:
+- id: b75b502c-758a-39be-0000-000000000000
+  name: StandardHttpContextMap
+  type: org.apache.nifi.http.StandardHttpContextMap
+  Properties:
+    Maximum Outstanding Requests:
+    Request Expiration:
+Process Groups: []
+Input Ports: []
+Output Ports: []
+Funnels: []
+Connections:
+- id: 8d54e133-8cce-39a0-0000-000000000000
+  name: ConvertRecord/failure/HandleHttpResponse
+  source id: b4c192cb-28d3-373d-0000-000000000000
+  source relationship names:
+  - failure
+  - success
+  destination id: 36e15f38-674d-3464-0000-000000000000
+  max work queue size: 10000
+  max work queue data size: 1 GB
+  flowfile expiration: 0 sec
+  queue prioritizer class: ''
+- id: b8e43a46-6359-3bc1-0000-000000000000
+  name: HandleHttpRequest/success/ConvertRecord
+  source id: 667ceda0-1262-3803-0000-000000000000
+  source relationship names:
+  - success
+  destination id: b4c192cb-28d3-373d-0000-000000000000
+  max work queue size: 10000
+  max work queue data size: 1 GB
+  flowfile expiration: 0 sec
+  queue prioritizer class: ''
+Remote Process Groups: []
+NiFi Properties Overrides: {}
