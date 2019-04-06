@@ -2,7 +2,7 @@
 
 ## Full documentation and instructions
 
-[My full blog post to get everything up and running.](https://pierrevillard.com/?p=3282)
+[My full blog post to get everything up and running.](https://pierrevillard.com/?p=3282) (also on [Medium](https://medium.com/@pierre.villard.fr/deploying-apache-nifi-workflows-on-google-cloud-run-8c0c988354f1))
 
 ## Quickstart
 
